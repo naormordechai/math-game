@@ -6,8 +6,11 @@ import './App.css';
 
 const styles = {
   container: {
-    background: 'black',
     height: '100vh',
+    background: '#000',
+    color: '#fff'
+  },
+  containerBody: {
     padding: '0 25px',
     color: '#fff',
     fontSize: '25px',
@@ -17,7 +20,14 @@ const styles = {
   },
   header: {
     display: 'flex',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    padding: '2px 10px',
+    background: 'rgba(150,150,150, .5)',
+    width: '50%',
+    margin: '0 auto',
+    '@media(max-width:500px)': {
+      width: '80%',
+    }
   }
 }
 
@@ -25,8 +35,9 @@ class App extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      data: 15,
-      translate: '',
+      data: 12,
+      translateStyle: '',
+      audio: new Audio('http://s1download-universal-soundbank.com/wav/3218.wav'),
       text: '',
       statsGames: {
         success: 0,
@@ -58,6 +69,7 @@ class App extends Component {
       data: prevState.data - 1
     }), () => {
       if (this.state.data === 0) {
+        this.state.audio.play()
         clearInterval(this.x)
         this.setState({
           ...this.state,
@@ -82,12 +94,14 @@ class App extends Component {
     const { data } = this.state
     return (
       <div className={classes.container}>
-        <Dialog translate={this.state.translate} text={this.state.text} action={() => window.location.reload()} />
         <div className={classes.header}>
           <div>Time: {this.state.data}</div>
           <div>{this.state.statsGames.success} / {this.state.statsGames.failed}</div>
         </div>
-        <Game data={data} stopInterval={this.clearIntervalx} statsGames={this.state.statsGames}/>
+        <div className={classes.containerBody}>
+          <Dialog translate={this.state.translate} text={this.state.text} action={() => window.location.reload()} />
+          <Game audioLose={this.state.audio} data={data} stopInterval={this.clearIntervalx} statsGames={this.state.statsGames} />
+        </div>
       </div>
     );
   }

@@ -5,7 +5,18 @@ import Countdown from 'react-countdown-now';
 import Number from '../../components/Number/Number'
 
 const styles = {
-    container: {
+    number: {
+        textAlign: 'center',
+        color: 'rgb(250,250,0)',
+        borderBottom: '3px solid red',
+        fontSize: '50px',
+        width:'100px',
+        margin:'0 auto',
+        '@media(max-width:500px)': {
+            width:'100%',
+        }
+    },
+    containerBody: {
         maxWidth: '650px',
         margin: '0 auto',
         marginTop: '50px',
@@ -28,8 +39,6 @@ const styles = {
             transform: 'rotate(-10deg)'
         }
     },
-    numberCard: {
-    }
 }
 
 class Game extends Component {
@@ -38,6 +47,7 @@ class Game extends Component {
         this.state = {
             nums: [],
             num: null,
+            audioWin:new Audio('http://audio.marsupialgurgle.com/audio/successtrumpet.mp3'),
             results: [],
             isFaild: false,
             translate: null,
@@ -117,6 +127,7 @@ class Game extends Component {
                     return acc + val
                 }, 0);
                 if (this.state.num === sum) {
+                    this.state.audioWin.play()
                     this.setState({
                         ...this.state,
                         translate: '0',
@@ -126,6 +137,7 @@ class Game extends Component {
                     statsGames.failed++
                     sessionStorage.setItem('bestGames', JSON.stringify(statsGames))
                 } else if (this.state.num < sum) {
+                    this.props.audioLose.play()
                     this.setState({
                         ...this.state,
                         translate: '0',
@@ -140,16 +152,20 @@ class Game extends Component {
     }
 
     randomColor = (ref) => {
-        if (ref && !ref.style.background) ref.style.background = this.getRandomColor()
+        if (ref && !ref.style.background) {
+            ref.style.background = this.getRandomColor()
+            ref.style.color = this.getRandomColor()
+        }
     }
 
     render() {
         const { classes, statsGames } = this.props
         return (
-            <div>
+            <div className={classes.container}>
+ 
                 <Dialog translate={this.state.translate} text={this.state.text} action={() => window.location.reload()} />
-                <div>{this.state.num}</div>
-                <div className={classes.container}>
+                <div className={classes.number}>{this.state.num}</div>
+                <div className={classes.containerBody}>
                     {this.state.nums.map((num, i) => (
                         <div ref={e => this[`num${i}`] = e}
                             key={i}

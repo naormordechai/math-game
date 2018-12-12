@@ -10,23 +10,43 @@ const styles = {
     height: '100vh',
     padding: '0 25px',
     color: '#fff',
-    fontSize: '25px'
+    fontSize: '25px',
+    fontFamily: 'cursive',
+    '& > *': {
+    }
   },
+  header: {
+    display: 'flex',
+    justifyContent: 'space-between'
+  }
 }
 
 class App extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      data: 10,
+      data: 15,
       translate: '',
-      text: ''
+      text: '',
+      statsGames: {
+        success: 0,
+        failed: 0
+      }
     }
   }
 
   x = null
 
   componentDidMount() {
+    if (!sessionStorage.getItem('bestGames')) {
+      sessionStorage.setItem('bestGames', JSON.stringify(this.state.statsGames))
+    } else {
+      const statsGames = JSON.parse(sessionStorage.getItem('bestGames'));
+      this.setState({
+        ...this.state,
+        statsGames
+      })
+    }
     this.x = setInterval(() => {
       this.updateDate()
     }, 1000);
@@ -42,7 +62,13 @@ class App extends Component {
         this.setState({
           ...this.state,
           translate: '0',
-          text: 'nope, the time is over, Try Again'
+          text: 'nope, the time is over, Try Again',
+          statsGames: {
+            ...this.state.statsGames,
+            failed: this.state.statsGames.failed + 1
+          }
+        }, () => {
+          sessionStorage.setItem('bestGames', JSON.stringify(this.state.statsGames))
         })
       }
     })
@@ -57,8 +83,11 @@ class App extends Component {
     return (
       <div className={classes.container}>
         <Dialog translate={this.state.translate} text={this.state.text} action={() => window.location.reload()} />
-        <div>{this.state.data}</div>
-        <Game data={data} stopInterval={this.clearIntervalx} />
+        <div className={classes.header}>
+          <div>Time: {this.state.data}</div>
+          <div>{this.state.statsGames.success} / {this.state.statsGames.failed}</div>
+        </div>
+        <Game data={data} stopInterval={this.clearIntervalx} statsGames={this.state.statsGames}/>
       </div>
     );
   }

@@ -39,7 +39,6 @@ class Game extends Component {
             nums: [],
             num: null,
             results: [],
-            timer: 10,
             isFaild: false,
             translate: null,
             text: ''
@@ -106,6 +105,8 @@ class Game extends Component {
     }
 
     handlerNumber = (num, stopInerval) => {
+        let statsGames = JSON.parse(sessionStorage.getItem('bestGames'));
+        console.log(statsGames);
         if (!num.isClicked) {
             num.isClicked = true
             this.setState({
@@ -121,12 +122,17 @@ class Game extends Component {
                         translate: '0',
                         text: 'Well Done, You did it!'
                     })
+                    statsGames.success++
+                    statsGames.failed++
+                    sessionStorage.setItem('bestGames', JSON.stringify(statsGames))
                 } else if (this.state.num < sum) {
                     this.setState({
                         ...this.state,
                         translate: '0',
                         text: 'nope, Try Again'
                     })
+                    statsGames.failed++
+                    sessionStorage.setItem('bestGames', JSON.stringify(statsGames))
                 }
                 stopInerval()
             })
@@ -138,7 +144,7 @@ class Game extends Component {
     }
 
     render() {
-        const { classes } = this.props
+        const { classes, statsGames } = this.props
         return (
             <div>
                 <Dialog translate={this.state.translate} text={this.state.text} action={() => window.location.reload()} />
@@ -149,7 +155,7 @@ class Game extends Component {
                             key={i}
                             style={{ background: this.randomColor(this[`num${i}`]), opacity: num.isClicked ? '.3' : null }}
                             className={classes.numberCard}>
-                            <Number key={i} value={num.num} click={() => this.handlerNumber(num, this.props.stopInterval)} />
+                            <Number key={i} value={num.num} click={() => this.handlerNumber(num, this.props.stopInterval, statsGames)} />
                         </div>
                     ))}
                 </div>
